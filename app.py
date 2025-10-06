@@ -11,6 +11,21 @@ CORS(app)
 
 EXCEL_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTehAmmwC6fZqVfOG1Z_AyfHVZUEh1HnOnRamIIK0eYLXjtpWn9BGf7u0YZnMk__NIBgLBE9SSGkasx/pub?output=xlsx"
 
+def clean_column_names(df):
+    """Limpia nombres de columnas para hacerlos más legibles"""
+    df = df.copy()
+    df.columns = [col.replace('Unnamed:', 'col_') 
+                 .replace('INFORMACI\u0004BN', 'INFO')
+                 .replace('SEGUIWISNTO', 'SEGUIMIENTO')
+                 .replace('\u00f1', 'ñ')
+                 .replace('\u00e1', 'á')
+                 .replace('\u00e9', 'é')
+                 .replace('\u00ed', 'í')
+                 .replace('\u00f3', 'ó')
+                 .replace('\u00fa', 'ú')
+                 for col in df.columns]
+    return df
+
 def convert_pandas_types(obj):
     """Convierte objetos pandas y datetime a tipos serializables"""
     if pd.isna(obj):
@@ -30,6 +45,10 @@ def get_excel_data():
         response.raise_for_status()
         
         excel_data = pd.read_excel(BytesIO(response.content))
+        
+        # LIMPIAR NOMBRES DE COLUMNAS
+        excel_data = clean_column_names(excel_data)
+        
         data = excel_data.to_dict('records')
         
         # Convertir objetos no serializables
