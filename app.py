@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 import pandas as pd
 import requests
@@ -83,6 +83,28 @@ def get_citas():
         })
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route('/api/citas', methods=['POST'])
+def crear_cita():
+    try:
+        # Obtener datos del request de BuilderBot
+        nueva_cita = request.get_json()
+        
+        # Aquí va tu lógica para guardar en Google Sheets
+        # Por ahora solo retornamos éxito para probar
+        print("📅 Nueva cita recibida:", nueva_cita)
+        
+        return jsonify({
+            "success": True,
+            "message": "Cita agendada exitosamente",
+            "cita": nueva_cita
+        }), 201
+        
+    except Exception as e:
+        return jsonify({
+            "success": False, 
+            "error": str(e)
+        }), 500
 
 @app.route('/health', methods=['GET'])
 def health_check():
